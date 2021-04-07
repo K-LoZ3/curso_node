@@ -1,0 +1,11 @@
+Soy
+un
+archivo
+para
+ser
+leido
+a
+traves
+de
+un
+stream
