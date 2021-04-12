@@ -2,7 +2,13 @@ const express = require('express');
 const app = express();
 
 const { config } = require('./config/index');
+const moviesApi = require('./routes/movies'); // Importamos el router.
 
+// Usamos la funcion para manejar el router o ruta /api/movies
+moviesApi(app);
+
+// Ejemplos.
+// *********************************************************************
 // Rita principal.
 app.get('/', function(req, res) {
   res.send('Hello work');
@@ -27,6 +33,7 @@ app.get('/leap/:year', function(req, res) {
     res.send(`El año ${year} no es bisiesto.`);
   }
 });
+// Fin de ejemplos.
 // *********************************************************************
 
 // Esto es para no quemar el puerto sino que lo traiga de config.
