@@ -21,6 +21,62 @@ function moviesApi(app) {
       next(err); // Manejamos el error.
     }
   });
+
+  router.get('/:movieId', async function(req, res, next) {
+    try {
+      // Retornamos la primera pelicula porque de momento no interesa que pelicula retornemos.
+      // Mas adelante usaremos movieId
+      const movie = await Promise.resolve(moviesMock[0]);
+      res.status(200).json({ 
+        data: movie, // Retornamos la pelicula.
+        message: 'movie retrieved',
+      });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.post('/', async function(req, res, next) {
+    try {
+      // Aunque aqui recive las peliculas para el post retornaremos la ultima pelicula.
+      // Cuando trabajemos con servicios lo haremos como debe ser.
+      const createdMovie = await Promise.resolve(moviesMock[0]);
+      res.status(201).json({  // El 201 es porque ese es el estatus code de crear.
+        data: createdMovie,
+        message: 'movie created',
+      });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.put('/:movieId', async function(req, res, next) {
+    try {
+      // Retornamos el id de la primera movie porque de momento no interesa que pelicula retornemos.
+      // Mas adelante usaremos movieId
+      const updatedMovieId = await Promise.resolve(moviesMock[0].id);
+      res.status(200).json({ 
+        data: updatedMovieId,
+        message: 'movie updated',
+      });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.delete('/:movieId', async function(req, res, next) {
+    try {
+      // Retornamos el id de la primera movie porque de momento no interesa que pelicula retornemos.
+      // Mas adelante usaremos movieId
+      const deletedMovieId = await Promise.resolve(moviesMock[0].id);
+      res.status(200).json({ 
+        data: deletedMovieId,
+        message: 'movie deleted',
+      });
+    } catch (err) {
+      next(err);
+    }
+  });
 }
 
 // Exportamos para que podamos manejar esta ruta con el router.
