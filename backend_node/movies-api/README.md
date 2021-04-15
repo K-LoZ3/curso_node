@@ -156,3 +156,16 @@ Create - crear
 Read - leer
 Update - actualizar
 Delete - eliminar
+
+https://www.mongodb.com/download-center/compass
+#### Conexión usando MongoDB Compass
+Si nosotros copiamos el Mongo URI desde Mongo Atlas podemos conectarnos fácilmente con MongoDB Compass.
+- Iniciamos sesión en MongoDB Atlas https://www.mongodb.com/cloud/atlas
+- Nos vamos a la sección de Clusters en el menú lateral izquierdo.
+- Seleccionamos connect en nuestro cluster sandbox.
+- Seleccionamos la opción Connect with MongoDB Compass.
+- Si no tenemos MongoDB Compass instalado, podemos descargarlo desde allí. Si ya lo tienes instalado continua con el paso 6.
+- Le damos clic en el botón copy para copiar el Mongo URI.
+- Abrimos MongoDB Compass e inmediatamente va a reconocer nuestra URI que tenemos en el portapapeles.
+- Hacemos clic en yes para que nos cree una nueva conexión, pero es necesario introducir el password del usuario de la base de datos.
+- Podemos ponerle un nombre favorito y darle en Create favorite y luego en Connect.
