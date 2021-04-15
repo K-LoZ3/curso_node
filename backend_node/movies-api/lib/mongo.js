@@ -1,6 +1,6 @@
 // Importamos mongo para poder usar las configuraciones de cliente de mongo db.
 // ObjectId sera usado en la siguiente clase.
-const { MongoClinet, ObjectId } = require('mongodb');
+const { MongoClient, ObjectId } = require('mongodb');
 const { config } = require('../config'); // Importamos las configuraciones para tener acceso a las variables de entorno.
 
 // Con encodeURIComponent aseguramos que si hay algunos caracteres expeciales no tengamos problemas al conectarnos.
@@ -13,7 +13,7 @@ const MONGO_URI = `mongodb+srv://${USER}:${PASSWORD}@${config.dbHost}:${config.p
 class MongoLib {
   constructor() {
     // Definimos el cliente.
-    this.client = new MongoClinet(MONGO_URI, { useNewUrlParser: true });
+    this.client = new MongoClient(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
     this.dbName = DB_NAME; // Definimos el nombre de la base de datos.
   }
 
@@ -39,6 +39,46 @@ class MongoLib {
 
     // Retornamos la coneccion si existe o si esta es creada.
     return MongoLib.connection;
+  }
+
+  // Creamos las funciones para trabajar con la base de datos.
+  getAll(collection, query) { // devuelve toda la coleccion.
+    // El connect o coneccion es una promesa.
+    return this.connect().then(db => {
+      // Usando la base de datos accedemos a la coleccion, le pasamos la coleccion para que sepa cual usamos
+      // y buscamos con query en la base de datos o coleccion, por ultimo convertimos a array para trabajarlo
+      // con json.
+      return db.collection(collection).find(query).toArray();
+    });
+  }
+
+  get(collection, id) {
+    return this.connect().then(db => {
+      // Dentro de la coleccion buscamos por la id.
+      return db.collection(collection).findOne({ _id: ObjectId(id) });
+    });
+  }
+
+  create(collection, data) {
+    return this.connect().then(db => {
+      // Insertamos la data.
+      return db.collection(collection).insertOne(data);
+    }).then(result => result.insertedId);
+  }
+
+  update(collection, id, data) {
+    return this.connect().then(db => {
+      // Para actualizar lo hacemos buscando por la id, son $set actualizamos el valor con la data y con
+      // upsert le decimos que actualize o inserte dependiendo de la necesidad.
+      return db.collection(collection).updateOne({ _id: ObjectId(id) }, { $set: data }, { upsert: true });
+    }).then(result => result.insertedId || id);
+  }
+
+  delete(collection, id) {
+    return this.connect().then(db => {
+      // Borramos con ayuda del id.
+      return db.collection(collection).deleteOne({ _id: ObjectId(id) });
+    }).then(() => id);
   }
 }
 

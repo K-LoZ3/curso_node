@@ -4,6 +4,9 @@ const app = express();
 const { config } = require('./config/index');
 const moviesApi = require('./routes/movies'); // Importamos el router.
 
+// body parser. Para que sepa interpretar los json en las rutas cuando pasamos los datos.
+app.use(express.json());
+
 // Usamos la funcion para manejar el router o ruta /api/movies
 moviesApi(app);
 
