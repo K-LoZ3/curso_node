@@ -3,12 +3,17 @@ const app = express();
 
 const { config } = require('./config/index');
 const moviesApi = require('./routes/movies'); // Importamos el router.
+const { logErrors, errorHandler } = require('./utils/middleware/errorHandlers');
 
 // body parser. Para que sepa interpretar los json en las rutas cuando pasamos los datos.
 app.use(express.json());
 
 // Usamos la funcion para manejar el router o ruta /api/movies
 moviesApi(app);
+
+// los middleware de error simpre deben ir al final de las rutas ya que estas tambien son middlewares.
+app.use(logErrors);
+app.use(errorHandler);
 
 // Ejemplos.
 // *********************************************************************

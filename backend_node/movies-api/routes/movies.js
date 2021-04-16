@@ -30,6 +30,9 @@ function moviesApi(app) {
       const movies = await moviesService.getMovies({ tags }); // Pedimos los datos del archivo falso.
       // Respondemos con estatus 200 y pasamos los datos que recivimos del archivo falso
       // mas un mensaje indicando lo que hicimos.
+
+      throw new Error('Inducimos error para probar el middleware de error.')
+
       res.status(200).json({ 
         data: movies,
         message: 'movies listed',
