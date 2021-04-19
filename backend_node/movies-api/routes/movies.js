@@ -4,6 +4,15 @@ const express = require('express');
 // const { moviesMock } = require('../utils/mocks/movies'); // Archivos de base de datos falsa por el momento.
 const MoviesService = require('../services/movies');
 
+const {
+  movieIdSchema,
+  createMovieSchema,
+  updateMovieSchema,
+} = require('../utils/schemas/movies'); // Importamos los schemas para validarlos.
+
+// Importamos para validar si los datos cumplen con el schema.
+const validationHandler = require('../utils/middleware/validationHandler');
+
 /* 
   Las rutas solo deben manejar url y parametros.
   Los servicios seran los que tengan la logica para las repuestas de los endPoints.
@@ -18,6 +27,7 @@ function moviesApi(app) {
   const moviesService = new MoviesService();
 
   // Este get del home se refuere a la ruta principal del router ( /api/movies ).
+  // No usaremos ninguna validacion de schema para este.
   router.get('/', async function(req, res, next) {
     // Se usa try/catch porque es codigo es asincrono pero con promesas y async/await.
 
@@ -31,7 +41,7 @@ function moviesApi(app) {
       // Respondemos con estatus 200 y pasamos los datos que recivimos del archivo falso
       // mas un mensaje indicando lo que hicimos.
 
-      throw new Error('Inducimos error para probar el middleware de error.')
+      //throw new Error('Inducimos error para probar el middleware de error.')
 
       res.status(200).json({ 
         data: movies,
@@ -42,7 +52,11 @@ function moviesApi(app) {
     }
   });
 
-  router.get('/:movieId', async function(req, res, next) {
+  // Para este get si ya que hacemos una peticion con el id y necesitamos que cumpla con el schema.
+  // Esta validacion la hacemos en el llamado de la funcion. Usamos la funcion validationHandler y como parametro solo
+  // necesitamos pasarle el schema y de donde sacara los datos. El schema lo pasamos con { movieId: movieIdSchema } y
+  // el segundo seria params ya que ahi estara el id que queremos validar.
+  router.get('/:movieId', validationHandler({ movieId: movieIdSchema }, 'params'), async function(req, res, next) {
     const { movieId } = req.params;
 
     try {
@@ -56,7 +70,10 @@ function moviesApi(app) {
     }
   });
 
-  router.post('/', async function(req, res, next) {
+  // Para el post necesitamos validar el schema create ya que con post cramos una nueva movie.
+  // Para este caso solo vamos a pasar el schema con el que queremos validar ya que los datos
+  // los sacara del body que es el valor por defecto del segundo parametro de esta funcion.
+  router.post('/', validationHandler(createMovieSchema), async function(req, res, next) {
     // Para el post los datos pasan es en el cuerpo de la peticion.
     // Entonces seria const { body } = req; Pero como no queremos que la variable
     // se llame body le ponemos un alias movie con { body: movie }
@@ -73,21 +90,28 @@ function moviesApi(app) {
     }
   });
 
-  router.put('/:movieId', async function(req, res, next) {
-    // Recivimos el cuerpo y el id de la pelicula que se va a actualizar.
-    const { body: movie } = req;
-    const { movieId } = req.params;
-    
-    try {
-      const updatedMovieId = await  moviesService.updateMovie({ movieId, movie });
-      res.status(200).json({ 
-        data: updatedMovieId,
-        message: 'movie updated',
-      });
-    } catch (err) {
-      next(err);
-    }
-  });
+  // Para este caso en el que se va a actualizar una movie. lo que se hace es colocar dos validaciones.
+  // De esta manera primero valida una y luego la otra. Como necesitamos validar el id y ademas validar
+  // el schema de actualizacion de movie.
+  router.put(
+    '/:movieId', 
+    validationHandler({ movieId: movieIdSchema }, 'params'), 
+    validationHandler(updateMovieSchema), 
+    async function(req, res, next) {
+      // Recivimos el cuerpo y el id de la pelicula que se va a actualizar.
+      const { body: movie } = req;
+      const { movieId } = req.params;
+      
+      try {
+        const updatedMovieId = await  moviesService.updateMovie({ movieId, movie });
+        res.status(200).json({ 
+          data: updatedMovieId,
+          message: 'movie updated',
+        });
+      } catch (err) {
+        next(err);
+      }
+    });
 
   // Reto Patch
   router.patch("/:movieId", async function(req,res,next) {
@@ -107,7 +131,8 @@ function moviesApi(app) {
 		}
 	});
 
-  router.delete('/:movieId', async function(req, res, next) {
+  // Para el delete solo hace falta validar el id.
+  router.delete('/:movieId', validationHandler({ movieId: movieIdSchema }, 'params'), async function(req, res, next) {
     const { movieId } = req.params;
 
     try {

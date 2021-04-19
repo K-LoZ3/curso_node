@@ -3,16 +3,22 @@ const app = express();
 
 const { config } = require('./config/index');
 const moviesApi = require('./routes/movies'); // Importamos el router.
-const { logErrors, errorHandler } = require('./utils/middleware/errorHandlers');
+const { logErrors, wrapErrors, errorHandler } = require('./utils/middleware/errorHandlers');
+const notFoundHandler = require('./utils/middleware/noyFoundHandler');
 
 // body parser. Para que sepa interpretar los json en las rutas cuando pasamos los datos.
 app.use(express.json());
 
 // Usamos la funcion para manejar el router o ruta /api/movies
-moviesApi(app);
+moviesApi(app); // Routes.
+
+// Catch 404. funciona mas como una ruta que como un middleware.
+// Por eso va justo despues de todas las rutas.
+app.use(notFoundHandler);
 
 // los middleware de error simpre deben ir al final de las rutas ya que estas tambien son middlewares.
 app.use(logErrors);
+app.use(wrapErrors); // Usamos el middleware que convierte los errores a boom y va en la mitad de estos 2 middleware de error.
 app.use(errorHandler);
 
 // Ejemplos.
