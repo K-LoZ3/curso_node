@@ -153,8 +153,42 @@ const moviesMock = [
   }
 ];
 
+// creamos esta utilidad para probar el servidor con los test.
+// Esto porque no vamos a usar las funciones de los servicios (la capa de servicios)
+// ya que no queremos hacer peticiones reales a los endpoints. Por esto creamos una
+// mini capa de servicios aqui para que responda las peticiones hechas como si estuviera
+// corriendo el servidor con normalidad.
+
+// Con esta funcion filtramos las movies por tags.
+function filteredMoviesMock(tag) {
+  // Retornamos una busqueda dentro de moviesMock que contiene las mivies y las filtramos
+  // antes para buscar en cada una de ellas las que incluyan el tag que pasamos a esta
+  // funcion, quedando un array con las movies que tengan este tag el cual retornamos.
+  return moviesMock.filter(movie => movie.tags.includes(tag));
+}
+
+// Este es el mock de los servicios. O sea, la capa de servicios falsa que el test usara
+// para hacer las peticiones. De esta manera no hara peticiones reales a mongoDB pero
+// devolvera los json de los mocks de aqui arriba como si vinieran de mongoDB al igual
+// que cuando no se habia implementado mongoDB.
+class MoviesServiceMock {
+  // Retornamos todas las movies del json con una promesa.
+  async getMovies() {
+    return Promise.resolve(moviesMock);
+  }
+
+  // Retornamos la primera movie del json como si se fuera creado esa en el POST.
+  // TODO: investigar como hacer el test en el que se pueda hacer pasando el id como
+  // parametro al igual como se hace en la capa de servicios real.
+  async createMovie() {
+    return Promise.resolve(moviesMock[0]);
+  }
+}
+
 module.exports = {
-  moviesMock
+  moviesMock,
+  filteredMoviesMock, // Exportamos para su uso.
+  MoviesServiceMock, // Exportamos para usarlo en el test.
 };
 
 // Para usarlos en postman.
