@@ -12,7 +12,8 @@ class MoviesService {
 
   async getMovies({ tags }) {
     /*
-    Esto es lo que se llama un IF Ternario, cumple la misma función de un condicional IF, nada más que escrito de distinta manera.
+    Esto es lo que se llama un IF Ternario, cumple la misma función de un condicional IF, nada más 
+    que escrito de distinta manera.
     */
     // const ifBasico = <condición> && <haz esto>;
     // const ifConElse = <condición> && <haz esto> : <sino haz esto>;
