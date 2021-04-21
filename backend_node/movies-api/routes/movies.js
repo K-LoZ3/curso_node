@@ -13,6 +13,11 @@ const {
 // Importamos para validar si los datos cumplen con el schema.
 const validationHandler = require('../utils/middleware/validationHandler');
 
+// Exportamos la funcion de establecer cache a las peticiones.
+const cacheResponse = require('../utils/cacheResponse');
+// Importamos los tiempos para usarlos al establecer la cache.
+const { FIVE_MINUTES_IN_SECONDS, SIXTY_MINUTES_IN_SECONDS } = require('../utils/time');
+
 /* 
   Las rutas solo deben manejar url y parametros.
   Los servicios seran los que tengan la logica para las repuestas de los endPoints.
@@ -30,6 +35,9 @@ function moviesApi(app) {
   // No usaremos ninguna validacion de schema para este.
   router.get('/', async function(req, res, next) {
     // Se usa try/catch porque es codigo es asincrono pero con promesas y async/await.
+
+    // Establecemos la cache en 300 milisegundos como esta en la constante.
+    cacheResponse(res, FIVE_MINUTES_IN_SECONDS);
 
     const { tags } = req.query; // Estos tags como vienen del query son los que se ponen el '?' el nombre del query.
     // Estos se pueden concatenar.
@@ -57,6 +65,9 @@ function moviesApi(app) {
   // necesitamos pasarle el schema y de donde sacara los datos. El schema lo pasamos con { movieId: movieIdSchema } y
   // el segundo seria params ya que ahi estara el id que queremos validar.
   router.get('/:movieId', validationHandler({ movieId: movieIdSchema }, 'params'), async function(req, res, next) {
+    // Establecemos la cache en 3600 milisegundos como esta en la constante.
+    cacheResponse(res, SIXTY_MINUTES_IN_SECONDS);
+
     const { movieId } = req.params;
 
     try {
